@@ -49,3 +49,16 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      # Notification step
+      - name: Send Pushover notification
+        if: always() # Ensure this step runs even if previous steps fail
+        env:
+          PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
+          PUSHOVER_USER_KEY: ${{ secrets.PUSHOVER_USER_KEY }}
+        run: |
+          curl -s \
+            --form-string "token=${PUSHOVER_API_TOKEN}" \
+            --form-string "user=${PUSHOVER_USER_KEY}" \
+            --form-string "message=Build and deployment for ${{ github.repository }} is finished. Check it at https://jimpeebles.github.io/code-yeller" \
+            https://api.pushover.net/1/messages.json
